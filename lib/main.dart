@@ -6,7 +6,6 @@ import 'package:webview_flutter/webview_flutter.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 🔥 لون الهيدر
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Color(0xFF121316),
@@ -42,6 +41,7 @@ class _WebViewScreenState extends State<WebViewScreen> {
   late final WebViewController controller;
 
   int currentIndex = 0;
+  bool isLoading = true;
 
   final List<String> urls = [
     "https://majidalbana.com",
@@ -57,23 +57,37 @@ class _WebViewScreenState extends State<WebViewScreen> {
 
     controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onPageStarted: (url) {
+            setState(() => isLoading = true);
+          },
+          onPageFinished: (url) {
+            setState(() => isLoading = false);
+          },
+        ),
+      )
       ..loadRequest(Uri.parse(urls[0]));
   }
 
-  void changePage(int index) {
+  // 🔥 حل مشكلة الضغط مرتين
+  Future<void> changePage(int index) async {
+    if (currentIndex == index) return;
+
     setState(() {
       currentIndex = index;
+      isLoading = true;
     });
 
-    controller.loadRequest(Uri.parse(urls[index]));
+    await controller.loadRequest(Uri.parse(urls[index]));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF121316), // 🔥 نفس لون الهيدر
+      backgroundColor: const Color(0xFF121316),
       body: Container(
-        color: const Color(0xFF121316), // 🔥 يغطي الفراغ
+        color: const Color(0xFF121316),
         child: SafeArea(
           child: Stack(
             children: [
@@ -81,7 +95,18 @@ class _WebViewScreenState extends State<WebViewScreen> {
                 child: WebViewWidget(controller: controller),
               ),
 
-              // 🔥 البار الزجاجي
+              // 🔥 لوجو بدل الشاشة البيضاء
+              if (isLoading)
+                Container(
+                  color: const Color(0xFF121316),
+                  child: Center(
+                    child: Image.asset(
+                      "assets/logo.png", // 👈 حط لوجو هنا
+                      width: 140,
+                    ),
+                  ),
+                ),
+
               glassNavBar(),
             ],
           ),
@@ -104,10 +129,10 @@ class _WebViewScreenState extends State<WebViewScreen> {
             height: 85,
             padding: const EdgeInsets.symmetric(horizontal: 10),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.08),
+              color: Colors.white.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(25),
               border: Border.all(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
               ),
             ),
             child: Row(
@@ -142,13 +167,15 @@ class _WebViewScreenState extends State<WebViewScreen> {
     bool isActive = currentIndex == index;
 
     return GestureDetector(
-      onTap: () => changePage(index),
+      onTap: () {
+        changePage(index); // 🔥 بدون await
+      },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
           color: isActive
-              ? Colors.white.withOpacity(0.15)
+              ? Colors.white.withValues(alpha: 0.15)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(15),
         ),

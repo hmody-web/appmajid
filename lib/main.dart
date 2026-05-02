@@ -65,15 +65,17 @@ class _WebViewScreenState extends State<WebViewScreen> {
   }
 
   // 🔥 حل مشكلة الضغط مرتين
-  Future<void> changePage(int index) async {
-    if (currentIndex == index) return;
+ Future<void> changePage(int index) async {
+  if (currentIndex == index) return;
 
-    setState(() {
-      currentIndex = index;
-    });
+  setState(() {
+    currentIndex = index;
+  });
 
-    await controller.loadRequest(Uri.parse(urls[index]));
-  }
+  await controller.runJavaScript(
+    "window.location.href='${urls[index]}'"
+  );
+}
 
   @override
   Widget build(BuildContext context) {

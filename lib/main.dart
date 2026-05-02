@@ -67,20 +67,9 @@ Future<void> changePage(int index) async {
     currentIndex = index;
   });
 
-  // إذا الصفحة الرئيسية
-  if (index == 0) {
-    await controller.loadRequest(Uri.parse("https://majidalbana.com"));
-    return;
-  }
-
-  // 🔥 نرجع للرئيسية أولاً
-  await controller.loadRequest(Uri.parse("https://majidalbana.com"));
-
-  // 🔥 ننتظر شويه حتى الصفحة تحمل
-  await Future.delayed(const Duration(milliseconds: 300));
-
-  // 🔥 بعدها نروح للقسم
-  await controller.loadRequest(Uri.parse(urls[index]));
+  await controller.runJavaScript('''
+    window.location.href = "${urls[index]}";
+  ''');
 }
   @override
   Widget build(BuildContext context) {

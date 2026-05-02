@@ -23,12 +23,12 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/logo.png
+    - assets/logoy.png
 
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/icon.png"
+  image_path: "assets/icony.png"
 
 flutter_native_splash:
   color: "#121316"

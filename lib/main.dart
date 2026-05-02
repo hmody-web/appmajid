@@ -41,7 +41,6 @@ class _WebViewScreenState extends State<WebViewScreen> {
   late final WebViewController controller;
 
   int currentIndex = 0;
-  bool isLoading = true;
 
   final List<String> urls = [
     "https://majidalbana.com",
@@ -59,12 +58,7 @@ class _WebViewScreenState extends State<WebViewScreen> {
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
         NavigationDelegate(
-          onPageStarted: (url) {
-            setState(() => isLoading = true);
-          },
-          onPageFinished: (url) {
-            setState(() => isLoading = false);
-          },
+         
         ),
       )
       ..loadRequest(Uri.parse(urls[0]));
@@ -76,7 +70,6 @@ class _WebViewScreenState extends State<WebViewScreen> {
 
     setState(() {
       currentIndex = index;
-      isLoading = true;
     });
 
     await controller.loadRequest(Uri.parse(urls[index]));
@@ -95,17 +88,7 @@ class _WebViewScreenState extends State<WebViewScreen> {
                 child: WebViewWidget(controller: controller),
               ),
 
-              // 🔥 لوجو بدل الشاشة البيضاء
-              if (isLoading)
-                Container(
-                  color: const Color(0xFF121316),
-                  child: Center(
-                    child: Image.asset(
-                      "assets/logo.png", // 👈 حط لوجو هنا
-                      width: 140,
-                    ),
-                  ),
-                ),
+           
 
               glassNavBar(),
             ],

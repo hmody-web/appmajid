@@ -6,6 +6,14 @@ import 'package:webview_flutter/webview_flutter.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // 🔥 لون الهيدر
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Color(0xFF121316),
+      statusBarIconBrightness: Brightness.light,
+    ),
+  );
+
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
   runApp(const MyApp());
@@ -32,7 +40,6 @@ class WebViewScreen extends StatefulWidget {
 
 class _WebViewScreenState extends State<WebViewScreen> {
   late final WebViewController controller;
-  bool isLoading = true;
 
   int currentIndex = 0;
 
@@ -50,23 +57,12 @@ class _WebViewScreenState extends State<WebViewScreen> {
 
     controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onPageStarted: (url) {
-            setState(() => isLoading = true);
-          },
-          onPageFinished: (url) {
-            setState(() => isLoading = false);
-          },
-        ),
-      )
       ..loadRequest(Uri.parse(urls[0]));
   }
 
   void changePage(int index) {
     setState(() {
       currentIndex = index;
-      isLoading = true;
     });
 
     controller.loadRequest(Uri.parse(urls[index]));
@@ -75,28 +71,20 @@ class _WebViewScreenState extends State<WebViewScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: SafeArea(
-        child: Stack(
-          children: [
-            SizedBox.expand(
-              child: WebViewWidget(controller: controller),
-            ),
-
-            // 🔥 Loading
-            if (isLoading)
-              Container(
-                color: const Color.fromARGB(255, 0, 2, 10),
-                child: const Center(
-                  child: CircularProgressIndicator(
-                    color: Color.fromARGB(255, 204, 134, 30),
-                  ),
-                ),
+      backgroundColor: const Color(0xFF121316), // 🔥 نفس لون الهيدر
+      body: Container(
+        color: const Color(0xFF121316), // 🔥 يغطي الفراغ
+        child: SafeArea(
+          child: Stack(
+            children: [
+              SizedBox.expand(
+                child: WebViewWidget(controller: controller),
               ),
 
-            // 🔥 البار الزجاجي
-            glassNavBar(),
-          ],
+              // 🔥 البار الزجاجي
+              glassNavBar(),
+            ],
+          ),
         ),
       ),
     );
@@ -140,7 +128,7 @@ class _WebViewScreenState extends State<WebViewScreen> {
     );
   }
 
-  // ===== عنصر الفاصل =====
+  // ===== الفاصل =====
   Widget divider() {
     return Container(
       width: 1,
@@ -149,7 +137,7 @@ class _WebViewScreenState extends State<WebViewScreen> {
     );
   }
 
-  // ===== عنصر الأيقونة =====
+  // ===== عنصر =====
   Widget navItem(IconData icon, String label, int index) {
     bool isActive = currentIndex == index;
 

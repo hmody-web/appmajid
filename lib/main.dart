@@ -56,15 +56,10 @@ class _WebViewScreenState extends State<WebViewScreen> {
 
     controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setNavigationDelegate(
-        NavigationDelegate(
-         
-        ),
-      )
       ..loadRequest(Uri.parse(urls[0]));
   }
 
-  // 🔥 حل مشكلة الضغط مرتين
+  // ✅ التنقل الصحيح
 Future<void> changePage(int index) async {
   if (currentIndex == index) return;
 
@@ -72,46 +67,34 @@ Future<void> changePage(int index) async {
     currentIndex = index;
   });
 
-  String js = "";
-
-  switch (index) {
-    case 1:
-      js = "document.querySelector('#lectures')?.scrollIntoView({behavior: 'smooth'});";
-      break;
-    case 2:
-      js = "document.querySelector('#pdfposts')?.scrollIntoView({behavior: 'smooth'});";
-      break;
-    case 3:
-      js = "document.querySelector('#posts')?.scrollIntoView({behavior: 'smooth'});";
-      break;
-    case 4:
-      js = "document.querySelector('#sitting')?.scrollIntoView({behavior: 'smooth'});";
-      break;
-    default:
-      js = "window.scrollTo({top:0, behavior:'smooth'});";
+  // إذا الصفحة الرئيسية
+  if (index == 0) {
+    await controller.loadRequest(Uri.parse("https://majidalbana.com"));
+    return;
   }
 
-  await controller.runJavaScript(js);
-}
+  // 🔥 نرجع للرئيسية أولاً
+  await controller.loadRequest(Uri.parse("https://majidalbana.com"));
 
+  // 🔥 ننتظر شويه حتى الصفحة تحمل
+  await Future.delayed(const Duration(milliseconds: 300));
+
+  // 🔥 بعدها نروح للقسم
+  await controller.loadRequest(Uri.parse(urls[index]));
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF121316),
-      body: Container(
-        color: const Color(0xFF121316),
-        child: SafeArea(
-          child: Stack(
-            children: [
-              SizedBox.expand(
-                child: WebViewWidget(controller: controller),
-              ),
+      body: SafeArea(
+        child: Stack(
+          children: [
+            SizedBox.expand(
+              child: WebViewWidget(controller: controller),
+            ),
 
-           
-
-              glassNavBar(),
-            ],
-          ),
+            glassNavBar(),
+          ],
         ),
       ),
     );
@@ -170,7 +153,7 @@ Future<void> changePage(int index) async {
 
     return GestureDetector(
       onTap: () {
-        changePage(index); // 🔥 بدون await
+        changePage(index); // بدون await
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
@@ -181,6 +164,7 @@ Future<void> changePage(int index) async {
               : Colors.transparent,
           borderRadius: BorderRadius.circular(15),
         ),
+
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

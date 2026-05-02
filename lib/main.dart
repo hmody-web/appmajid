@@ -65,16 +65,33 @@ class _WebViewScreenState extends State<WebViewScreen> {
   }
 
   // 🔥 حل مشكلة الضغط مرتين
- Future<void> changePage(int index) async {
+Future<void> changePage(int index) async {
   if (currentIndex == index) return;
 
   setState(() {
     currentIndex = index;
   });
 
-  await controller.runJavaScript(
-    "window.location.href='${urls[index]}'"
-  );
+  String js = "";
+
+  switch (index) {
+    case 1:
+      js = "document.querySelector('#lectures')?.scrollIntoView({behavior: 'smooth'});";
+      break;
+    case 2:
+      js = "document.querySelector('#pdfposts')?.scrollIntoView({behavior: 'smooth'});";
+      break;
+    case 3:
+      js = "document.querySelector('#posts')?.scrollIntoView({behavior: 'smooth'});";
+      break;
+    case 4:
+      js = "document.querySelector('#sitting')?.scrollIntoView({behavior: 'smooth'});";
+      break;
+    default:
+      js = "window.scrollTo({top:0, behavior:'smooth'});";
+  }
+
+  await controller.runJavaScript(js);
 }
 
   @override
